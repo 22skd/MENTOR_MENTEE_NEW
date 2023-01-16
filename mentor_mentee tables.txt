@@ -1,0 +1,52 @@
+ 1) create table personal_development( mentee_id varchar(15) not null references mentee(mentee_id) on delete cascade,
+  sem_no int not null references semester(sem_no) on delete cascade,
+    activity_name varchar(45) not null,
+    activity_nature varchar(45) not null,
+    achivements varchar(20) ,  cerificate_photo blob,primary key(mentee_id,sem_no,activity_name));
+
+
+
+2) CREATE TABLE mentee (
+    mentee_id varchar(15) PRIMARY KEY,
+    mentee_name VARCHAR(30) NOT NULL,
+    mentor_id varchar(15) NOT NULL,
+    address VARCHAR(30) NOT NULL,
+    gender varchar(10) not Null,
+    phone_number int NOT NULL,
+ 
+    section varchar(10) not null,
+    CONSTRAINT fk_mentor FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id) on delete cascade   
+);
+
+
+
+
+
+4)CREATE TABLE `semester` (
+  `mentee_id` varchar(15) NOT NULL,
+  `sem_no` int NOT NULL,
+  `scheme` int NOT NULL,
+  PRIMARY KEY (`mentee_id`,`sem_no`)
+) ;
+
+5)CREATE TABLE subject (
+    sub_id INT ,
+    subject_name VARCHAR(80) not null,
+    mentor_id varchar(15) not null references mentee(mentee_id) on delete cascade ,
+    mentee_id varchar(15) not null references mentor(mentor_id) on delete cascade,
+    sem_no INT not null references semester(sem_no) on delete cascade,
+    attendance INT,
+    CIE_1 INT CHECK (CIE_1 >= 0 AND CIE_1 <= 30),
+    CIE_2 INT CHECK (CIE_2 >= 0 AND CIE_2 <= 30),
+    CIE_3 INT CHECK (CIE_3 >= 0 AND CIE_3 <= 30),
+    finalmarks INT, primary key(sub_id,mentor_id,mentee_id,sem_no)
+);
+CREATE TABLE `mentor` (
+  `mentor_id` varchar(15) NOT NULL,
+  `mentor_name` varchar(45) NOT NULL,
+  `branch` varchar(20) NOT NULL,
+  `gender` varchar(10) NOT NULL,
+  `phno` decimal(10,0) NOT NULL,
+  PRIMARY KEY (`mentor_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
