@@ -1,0 +1,117 @@
+CREATE TABLE `mentor` (
+  `mentor_id` varchar(15) NOT NULL,
+  `mentor_name` varchar(45) NOT NULL,
+  `branch` varchar(20) NOT NULL,
+  `gender` varchar(10) NOT NULL,
+  `phno` bigint NOT NULL,
+  PRIMARY KEY (`mentor_id`),
+  CONSTRAINT `phone_number_check2` CHECK ((`phno` between 6000000000 and 9999999999))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+CREATE TABLE `mentee` (
+  `mentee_id` varchar(15) NOT NULL,
+  `mentee_name` varchar(30) NOT NULL,
+  `mentor_id` varchar(15) NOT NULL,
+  `address` varchar(30) NOT NULL,
+  `gender` varchar(10) NOT NULL,
+  `phone_number` bigint NOT NULL,
+  `branch` varchar(10) NOT NULL,
+  `sem_no` int NOT NULL,
+  PRIMARY KEY (`mentee_id`),
+  KEY `mentor_id_idx` (`mentor_id`),
+  CONSTRAINT `mentor_id` FOREIGN KEY (`mentor_id`) REFERENCES `mentor` (`mentor_id`) ON DELETE CASCADE,
+  CONSTRAINT `phone_number_check` CHECK ((`phone_number` between 6000000000 and 9999999999))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+CREATE TABLE `personal_development` (
+  `sem_no` int NOT NULL,
+  `activity_name` varchar(45) NOT NULL,
+  `activity_nature` varchar(45) NOT NULL,
+  `achivements` varchar(20) NOT NULL,
+  `certificate_no` varchar(15) NOT NULL,
+  `cerificate_photo` blob NOT NULL,
+  PRIMARY KEY (`certificate_no`),
+  KEY `certificate_no_idx` (`certificate_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+CREATE TABLE `studies` (
+  `mentee_id` varchar(15) NOT NULL,
+  `sub_code` varchar(10) NOT NULL,
+  `attendance` double DEFAULT NULL,
+  `CIE_1` int DEFAULT NULL,
+  `CIE_2` int DEFAULT NULL,
+  `CIE_3` int DEFAULT NULL,
+  `finalmarks` int DEFAULT NULL,
+  `sem_no` int NOT NULL,
+  `remark` varchar(120) DEFAULT NULL,
+  PRIMARY KEY (`mentee_id`,`sub_code`),
+  KEY `stsub_code_idx` (`sub_code`),
+  CONSTRAINT `stmentee_id` FOREIGN KEY (`mentee_id`) REFERENCES `mentee` (`mentee_id`) ON DELETE CASCADE,
+  CONSTRAINT `stsub_code` FOREIGN KEY (`sub_code`) REFERENCES `subject` (`sub_code`) ON DELETE CASCADE,
+  CONSTRAINT `studies_chk_1` CHECK (((`CIE_1` >= 0) and (`CIE_1` <= 30))),
+  CONSTRAINT `studies_chk_2` CHECK (((`CIE_2` >= 0) and (`CIE_2` <= 30))),
+  CONSTRAINT `studies_chk_3` CHECK (((`CIE_3` >= 0) and (`CIE_3` <= 30)))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+
+CREATE TABLE `subject` (
+  `sub_code` varchar(10) NOT NULL,
+  `subject_name` varchar(50) NOT NULL,
+  `credits` int NOT NULL,
+  PRIMARY KEY (`sub_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+
+CREATE TABLE `take_part_in` (
+  `mentee_id` varchar(15) NOT NULL,
+  `certificate_no` varchar(15) NOT NULL,
+  PRIMARY KEY (`mentee_id`,`certificate_no`),
+  KEY `certificate_idx` (`certificate_no`),
+  CONSTRAINT `certificate` FOREIGN KEY (`certificate_no`) REFERENCES `personal_development` (`certificate_no`) ON DELETE CASCADE,
+  CONSTRAINT `menteeid` FOREIGN KEY (`mentee_id`) REFERENCES `mentee` (`mentee_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+
+DDELIMITER $$
+CREATE TRIGGER avg_cie_insert
+BEFORE INSERT ON studies
+FOR EACH ROW
+BEGIN
+    SET NEW.finalmarks = (NEW.CIE_1 + NEW.CIE_2 + NEW.CIE_3) / 3;
+END$$
+DELIMITER ;
+
+
+
+
+DELIMITER $$
+CREATE TRIGGER avg_cie_update
+BEFORE UPDATE ON studies
+FOR EACH ROW
+BEGIN
+    SET NEW.finalmarks = (NEW.CIE_1 + NEW.CIE_2 + NEW.CIE_3) / 3;
+END$$
+DELIMITER ;
+
+
+
+
+DELIMITER $$
+CREATE PROCEDURE insert_subject (IN sub_code VARCHAR(10), IN subject_name VARCHAR(50), IN credits INT)
+BEGIN
+    INSERT INTO subject (sub_code, subject_name, credits) 
+    VALUES (sub_code, subject_name, credits);
+END$$
+DELIMITER ;
