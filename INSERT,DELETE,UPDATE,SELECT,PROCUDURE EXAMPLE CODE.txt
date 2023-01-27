@@ -1,0 +1,237 @@
+import java.sql.*;
+/**
+ *
+ * @author USER
+ */
+public class ConnectionProvider {
+    
+    public static Connection getCon(){
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+	    Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/mentor_mentee","root","Spartans420@"); 
+            return con ;
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+        
+        
+    }
+    
+}
+
+
+
+
+#INSERT STATMENT EXAMPLE
+
+ try{
+           Connection con=ConnectionProvider.getCon();
+           Statement st=con.createStatement();
+           String mentee_id=jTextField1.getText();
+           String mentee_name=jTextField2.getText();
+           String mentor_id=jTextField3.getText();
+           String address=addressField.getText();
+           Long phnoNumber=Long.parseLong(jTextField5.getText());
+           int sem_no =Integer.parseInt(jComboBox1.getSelectedItem().toString());
+           
+          String branch=jComboBox2.getSelectedItem().toString();
+       
+          
+          
+          
+          if(rbMale.isSelected())
+          {
+              String gender=rbMale.getText();
+              String query1 = "INSERT INTO mentee VALUES ('" + mentee_id + "', '" + mentee_name + "', '" + mentor_id + "', '" + address + "', '" + gender + "', '" + phnoNumber + "',  '" + branch + "','"+sem_no+"')";
+
+            st.executeUpdate(query1);
+          }
+          else{
+             String gender=rbFemale.getText(); 
+             String query1 = "INSERT INTO mentee VALUES ('" + mentee_id + "', '" + mentee_name + "', '" + mentor_id + "', '" + address + "', '" + gender + "', '" + phnoNumber + "',  '" + branch + "','"+sem_no+"')";
+             st.executeUpdate(query1);
+             
+          }
+         
+            JOptionPane.showMessageDialog(null, "insertion sucessfull");
+        }
+        catch(Exception e){
+             JOptionPane.showMessageDialog(null, e);
+        }
+
+
+
+
+#ALTERNATIVE INSERT EXAMPLE
+
+ try{
+           Connection con=ConnectionProvider.getCon();
+           Statement st=con.createStatement();
+           String mentee_id=jTextField1.getText();
+           String mentee_name=jTextField2.getText();
+           String mentor_id=jTextField3.getText();
+           String address=jTextField4.getText();
+           String gender =jComboBox1.getSelectedItem().toString();
+           long phnoNumber=Long.parseLong(phnoText.getText());
+            int sem_no =Integer.parseInt(jComboBox2.getSelectedItem().toString());
+            
+            String branch=jComboBox4.getSelectedItem().toString();
+          
+          
+             String query1 = "INSERT INTO mentee VALUES ('" + mentee_id + "', '" + mentee_name + "', '" + mentor_id + "', '" + address + "', '" + gender + "', '" + phnoNumber + "',  '" + branch + "','"+sem_no+"')";
+
+            st.executeUpdate(query1);
+            
+              JOptionPane.showMessageDialog(null, "insertion sucessfull");
+               showTableData();
+               clearTable();
+        }
+        catch(Exception e){
+              JOptionPane.showMessageDialog(null, e);
+        }
+
+
+
+
+
+
+#DELETE STATMENT OF SUBJECT TABLE
+
+
+String sub_code=jTextField3.getText();
+        try{
+             Connection con=ConnectionProvider.getCon();
+              String Query3="delete from subject where sub_code= ?";
+              java.sql.PreparedStatement pst = con.prepareStatement(Query3);
+               pst.setString(1, sub_code);
+               pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "deleted the details");
+                showTale2();
+        }
+        catch(Exception e){
+            
+            JOptionPane.showMessageDialog(null, e);
+        }
+
+
+
+
+
+#ALTERNATIVE DELETE EXAMPLE
+
+      int row1=jTable1.getSelectedRow();
+        String Selection1=jTable1.getModel().getValueAt(row1, 0).toString();
+         try{
+             Connection con=ConnectionProvider.getCon();
+             String sql2="DELETE from mentee WHERE  mentee_id ='"+Selection1+"'";
+              PreparedStatement pst = con.prepareStatement(sql2);
+              pst.execute();
+                 JOptionPane.showMessageDialog(null, "deleted sucessfull");
+                 showTableData();
+         }
+         catch(Exception e){
+             JOptionPane.showMessageDialog(null, e);
+             e.printStackTrace();
+             
+         }
+
+
+
+
+
+#UPDATE STATMENT EXAMPLE
+
+
+      try{
+           Connection con=ConnectionProvider.getCon();
+           
+           String mentee_id=jTextField1.getText();
+           String mentee_name=jTextField2.getText();
+           String mentor_id=jTextField3.getText();
+           String address=jTextField4.getText();
+           String gender =jComboBox1.getSelectedItem().toString();
+           long phone_number=Long.parseLong(phnoText.getText());
+            int sem_no =Integer.parseInt(jComboBox2.getSelectedItem().toString());
+            String branch=jComboBox4.getSelectedItem().toString();
+            
+              
+            String updateMentee = "UPDATE mentee SET mentee_name = ?,mentor_id = ?,address=?,gender= ?,phone_number= ?,branch= ?,sem_no=? WHERE mentee_id = ?";
+             try (PreparedStatement ps1 = con.prepareStatement(updateMentee);
+                 ) {
+          
+       
+        ps1.setString(1, mentee_name);
+        ps1.setString(3, address);
+        ps1.setString(4, gender);
+        ps1.setLong(5, phone_number);
+            ps1.setString(6, branch);
+            ps1.setInt(7, sem_no);
+              ps1.setString(8, mentee_id);
+                ps1.setString(2, mentor_id);
+             ps1.executeUpdate();
+         
+       JOptionPane.showMessageDialog(null, "updated sucessfull");
+        showTableData();
+        clearTable();
+    } catch (SQLException e1) {
+        e1.printStackTrace();
+        JOptionPane.showMessageDialog(null, e1);
+    }
+            
+         }
+         catch(Exception e){
+             JOptionPane.showMessageDialog(null, e);
+         }
+
+
+
+
+
+
+#SELECT STATMENT EXAMPLE
+
+String mid=jTextField3.getText();
+             try{
+                 Connection con=ConnectionProvider.getCon();
+                 String sql="select * from mentee where mentor_id='"+mid+"'";
+                 PreparedStatement pst = con.prepareStatement(sql);
+                  ResultSet rs =pst.executeQuery();
+                  jTable1.setModel(DbUtils.resultSetToTableModel(rs));
+             }   
+             catch(Exception e){
+                 JOptionPane.showMessageDialog(null, e);
+                 e.printStackTrace();
+             }
+
+
+
+
+
+
+#STORED PROCUDURE CALL
+
+
+try{
+       Connection con=ConnectionProvider.getCon();
+        Statement st=con.createStatement();
+        String mentor_id=jTextField1.getText();
+        String sub_code=jTextField3.getText();
+        int credits=Integer.parseInt(jTextField2.getText());
+        String subject_name=jTextField4.getText();
+
+        CallableStatement cstmt = (CallableStatement) con.prepareCall("{call insert_subject(?,?,?)}");
+                 cstmt.setString(1, sub_code);
+                 cstmt.setString(2, subject_name);
+                  cstmt.setInt(3, credits);
+                 cstmt.execute();
+
+               JOptionPane.showMessageDialog(null, "saved the details");
+               showTale2();
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+
